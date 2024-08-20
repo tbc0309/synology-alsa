@@ -36,7 +36,13 @@ jobs:
       run: |
         docker pull ghcr.io/synocommunity/spksrc
         git clone --depth=1 https://github.com/SynoCommunity/spksrc.git
-        # cp -rf src/* spksrc
+
+        # modify
+        MF="spksrc/diyspk/alsa-utils/Makefile"
+        grep -q '^SPK_ICON' "${MF}" || (cp -rf src/* spksrc; sed -i '/^DEPENDS/i\SPK_ICON = src\/\$(SPK_NAME).png' "${MF}")
+        grep -q '/alsa-info.sh' "${MF}" || sed -i '/spksrc.spk.mk/i\SPK_COMMANDS += sbin/alsa-info.sh' "${MF}"
+        grep -q '/alsaconf' "${MF}" || sed -i '/spksrc.spk.mk/i\SPK_COMMANDS += sbin/alsaconf' "${MF}"
+        grep -q '/alsactl' "${MF}" || sed -i '/spksrc.spk.mk/i\SPK_COMMANDS += sbin/alsactl' "${MF}"
 
     - name: Build Package
       run: |
